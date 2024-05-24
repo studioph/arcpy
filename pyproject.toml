@@ -1,0 +1,23 @@
+[project]
+name = "arcpy"
+version = "0.1.0"
+description = "Archive operations"
+authors = [
+    {name = "Paul Hutchings", email = "dev@studiop.page"},
+]
+dependencies = [
+    "unrar @ git+https://github.com/matiasb/python-unrar.git@ceaf02fb6251270d69a5768daefbf3795653f64a",
+    "unrar2-cffi>=0.3.1",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=8.2.1",
+]
