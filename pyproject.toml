@@ -7,7 +7,6 @@ authors = [
 ]
 dependencies = [
     "unrar @ git+https://github.com/matiasb/python-unrar.git@ceaf02fb6251270d69a5768daefbf3795653f64a",
-    "unrar2-cffi>=0.3.1",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
