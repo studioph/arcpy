@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from arcpy import archive, util
+import arcpy as archive
 
 TEST_DATA_FOLDER = Path(__file__).parent / "data"
 
@@ -17,7 +17,7 @@ TEST_DATA_FOLDER = Path(__file__).parent / "data"
     ],
 )
 def test_get_archive_name(file: Path, expected: str):
-    assert util.get_archive_name(file) == expected
+    assert archive.get_archive_name(file) == expected
 
 
 def test_rar(tmp_path: Path):

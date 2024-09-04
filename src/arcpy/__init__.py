@@ -1,3 +1,4 @@
+import fnmatch
 import logging
 import pathlib
 import tarfile
@@ -7,9 +8,8 @@ from os import PathLike, fspath
 from types import TracebackType
 from typing import Generic, Iterable, Type, TypeVar
 
+import context_utils
 from unrar import rarfile
-
-from . import util
 
 LOG = logging.getLogger(__name__)
 
@@ -41,16 +41,13 @@ class Archive(Generic[T], ABC):
 
     def __init__(self, filepath: PathLike) -> None:
         self.parts = [pathlib.Path(filepath)]
-        self.name = util.get_archive_name(self.parts[0])
+        self.name = get_archive_name(self.parts[0])
         self.multipart = "part" in self.parts[0].name
         if self.multipart:
             self._get_parts()
 
     def __str__(self) -> str:
-        return str(self.parts[0].parent / self.name)
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__qualname__}('{self}')"
+        return f"{self.__class__.__qualname__}('{self.parts[0].parent / self.name}')"
 
     def __enter__(self):
         self._archive.__enter__()
@@ -88,7 +85,7 @@ class Archive(Generic[T], ABC):
 class ZipArchive(Archive[zipfile.ZipFile], extensions=(".zip",)):
 
     def __init__(self, filepath: PathLike) -> None:
-        with util.reraise(zipfile.BadZipFile, as_=ArchiveError):
+        with context_utils.rethrow(zipfile.BadZipFile, as_=ArchiveError):
             super().__init__(filepath)
             self._archive = zipfile.ZipFile(file=filepath)
 
@@ -97,7 +94,7 @@ class ZipArchive(Archive[zipfile.ZipFile], extensions=(".zip",)):
         return self._archive.namelist()
 
     def extract_items(self, items: Iterable[PathLike], dest: PathLike):
-        with util.reraise(RuntimeError, as_=ArchiveError):
+        with context_utils.rethrow(RuntimeError, as_=ArchiveError):
             return self._archive.extractall(members=items, path=dest)
 
 
@@ -117,7 +114,7 @@ class TarArchive(
 ):
 
     def __init__(self, filepath: PathLike) -> None:
-        with util.reraise(
+        with context_utils.rethrow(
             tarfile.ReadError, tarfile.CompressionError, as_=ArchiveError
         ):
             super().__init__(filepath)
@@ -128,7 +125,7 @@ class TarArchive(
         return self._archive.getnames()
 
     def extract_items(self, items: Iterable[PathLike], dest: PathLike):
-        with util.reraise(KeyError, as_=ArchiveError):
+        with context_utils.rethrow(KeyError, as_=ArchiveError):
             tarinfos = [self._archive.getmember(item) for item in items]
             return self._archive.extractall(members=tarinfos, path=dest)
 
@@ -136,7 +133,7 @@ class TarArchive(
 class RarArchive(Archive[rarfile.RarFile], extensions=(".rar",)):
 
     def __init__(self, filepath: PathLike) -> None:
-        with util.reraise(rarfile.BadRarFile, as_=ArchiveError):
+        with context_utils.rethrow(rarfile.BadRarFile, as_=ArchiveError):
             super().__init__(filepath)
             self._archive = rarfile.RarFile(filename=fspath(filepath))
 
@@ -145,7 +142,7 @@ class RarArchive(Archive[rarfile.RarFile], extensions=(".rar",)):
         return self._archive.namelist()
 
     def extract_items(self, items: Iterable[PathLike], dest: PathLike):
-        with util.reraise(RuntimeError, as_=ArchiveError):
+        with context_utils.rethrow(RuntimeError, as_=ArchiveError):
             return self._archive.extractall(members=items, path=fspath(dest))
 
 
@@ -158,3 +155,11 @@ def open(filepath: PathLike) -> Archive:  # pylint: disable=redefined-builtin
             return registry_entry(path)
 
     raise ArchiveError(f"No archive type found in registry for {path.name}")
+
+
+def get_archive_name(file: pathlib.Path):
+    # Keep chopping off suffix until "part" is no longer included
+    tmp_path = pathlib.PurePath(file.stem)
+    while fnmatch.filter(tmp_path.suffixes, pat=".part*"):
+        tmp_path = pathlib.PurePath(tmp_path.stem)
+    return tmp_path.name
