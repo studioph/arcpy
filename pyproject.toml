@@ -7,8 +7,9 @@ authors = [
 ]
 dependencies = [
     "unrar @ git+https://github.com/matiasb/python-unrar.git@ceaf02fb6251270d69a5768daefbf3795653f64a",
+    "context-utils @ file:///${PROJECT_ROOT}/../context-utils",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "MIT"}
 
