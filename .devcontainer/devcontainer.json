@@ -18,14 +18,12 @@
         "vscodium": {
             "extensions": [
                 "tamasfe.even-better-toml@0.19.1",
-                "antfu.icons-carbon",
                 "eamodio.gitlens",
                 "detachhead.basedpyright",
                 "ms-python.black-formatter",
                 "ms-python.isort",
                 "ms-python.pylint",
                 "ms-python.python",
-                "t3dotgg.vsc-material-theme-but-i-wont-sue-you",
                 "mechatroner.rainbow-csv"
             ]
         }
