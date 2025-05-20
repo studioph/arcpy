@@ -8,6 +8,7 @@ authors = [
 dependencies = [
     "unrar @ git+https://github.com/matiasb/python-unrar.git@ceaf02fb6251270d69a5768daefbf3795653f64a",
     "context-utils @ file:///${PROJECT_ROOT}/../context-utils",
+    "py7zr>=0.22.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
