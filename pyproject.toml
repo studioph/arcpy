@@ -7,12 +7,12 @@ authors = [
 ]
 dependencies = [
     "unrar @ git+https://github.com/matiasb/python-unrar.git@ceaf02fb6251270d69a5768daefbf3795653f64a",
-    "context-utils @ file:///${PROJECT_ROOT}/../context-utils",
+    "context-utils @ git+https://github.com/studioph/context-utils.git",
     "py7zr>=0.22.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "GPL3.0"}
 
 [build-system]
 requires = ["pdm-backend"]
@@ -38,11 +38,9 @@ profile = "black"
 
 [tool.pytest.ini_options]
 testpaths = ["__test__"]
-addopts = ["--cov=arcpy", "--cov-report=html", "--import-mode=importlib"]
 
 [tool.coverage.run]
 branch = true
-# source = ["arcpy"]
 
 [tool.coverage.report]
 show_missing = true
