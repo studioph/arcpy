@@ -62,6 +62,12 @@ def test_tar_throws(tmp_path: Path):
         tar.extract("foo", dest=tmp_path)
 
 
+def test_7z(tmp_path: Path):
+    with archive.open(TEST_DATA_FOLDER / "test.7z") as z7:
+        z7.extract("test", dest=tmp_path)
+    assert tmp_path.joinpath("test").exists()
+
+
 @pytest.mark.parametrize(
     ("file",),
     [
@@ -69,6 +75,7 @@ def test_tar_throws(tmp_path: Path):
         (TEST_DATA_FOLDER / "test.rar",),
         (fspath(TEST_DATA_FOLDER / "test.tar.gz"),),
         (TEST_DATA_FOLDER / "test.copy.tar.gz",),
+        (TEST_DATA_FOLDER / "test.7z",),
     ],
 )
 def test_open(file: PathLike):
@@ -90,6 +97,13 @@ def test_open(file: PathLike):
             [
                 TEST_DATA_FOLDER / "multipart.part1.zip",
                 TEST_DATA_FOLDER / "multipart.part2.zip",
+            ],
+        ),
+        (
+            TEST_DATA_FOLDER / "multipart.7z.001",
+            [
+                TEST_DATA_FOLDER / "multipart.7z.001",
+                TEST_DATA_FOLDER / "multipart.7z.002",
             ],
         ),
     ],
