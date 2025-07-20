@@ -4,11 +4,13 @@ import pathlib
 import tarfile
 import zipfile
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from os import PathLike, fspath
 from types import TracebackType
-from typing import Generic, Iterable, Type, TypeVar
+from typing import Generic, TypeVar
 
 import context_utils
+import py7zr
 from unrar import rarfile
 
 LOG = logging.getLogger(__name__)
@@ -34,7 +36,7 @@ def register(cls, *extensions: str):
 
 
 class Archive(Generic[T], ABC):
-    _archive: Type[T]
+    _archive: type[T]
 
     def __init_subclass__(cls, /, extensions: Iterable[str]) -> None:
         register(cls, *extensions)
@@ -144,6 +146,9 @@ class RarArchive(Archive[rarfile.RarFile], extensions=(".rar",)):
     def extract_items(self, items: Iterable[PathLike], dest: PathLike):
         with context_utils.rethrow(RuntimeError, as_=ArchiveError):
             return self._archive.extractall(members=items, path=fspath(dest))
+
+
+class SevenZipArchive(Archive[py7zr.SevenZipFile], extensions=(".7z")): ...
 
 
 def open(filepath: PathLike) -> Archive:  # pylint: disable=redefined-builtin
